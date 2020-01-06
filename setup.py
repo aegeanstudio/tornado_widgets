@@ -3,10 +3,6 @@
 from setuptools import setup, find_packages
 
 
-package = 'tornado_widgets'
-version = '0.0.0'
-
-
 def valid_requirement(line):
     if not line:
         return False
@@ -25,15 +21,15 @@ def parse_requirements(filename):
 
 
 setup(
-    name=package,
-    version=version,
+    name='tornado_widgets',
+    use_scm_version=True,
     description='Easier Tornado Web Application Development',
-    url='https://github.com/aegean/tornado_widgets',
-    packages=find_packages(),
+    author='AeGean-Studio',
+    author_email='wyqsmith@aegeanstudio.com',
+    url='https://github.com/AeGean-Studio/tornado_widgets',
+    license='BSD',
+    packages=find_packages(exclude=['tests', 'example']),
     install_requires=parse_requirements('requirements.txt'),
-    entry_points={
-        'console_scripts': [],
-    },
-    maintainer='AeGean Studio',
-    maintainer_email='wyqsmith@aegeanstudio.com',
+    setup_requires=['setuptools_scm'],
+    python_requires='>=3.6',
 )

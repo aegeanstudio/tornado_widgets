@@ -18,3 +18,5 @@ pep8-naming
 
 # VCS
 bumpversion
+setuptools_scm
+twine

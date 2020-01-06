@@ -1,9 +1,10 @@
 --index-url=https://pypi.tuna.tsinghua.edu.cn/simple
 
-aiomysql
 aioredis
-apispec
+apispec-webframeworks
+databases[mysql]
 marshmallow
+python-dateutil
 tornado
 raven
 uvloop

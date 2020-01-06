@@ -20,3 +20,7 @@ clean:
 lint:
 	@[ -n "$(VIRTUAL_ENV)" ] || (echo 'out of virtualenv'; exit 1)
 	@$(WITH_ENV) flake8
+
+dist: clean
+	@[ -n "$(VIRTUAL_ENV)" ] || (echo 'out of virtualenv'; exit 1)
+	@$(WITH_ENV) python3 ./setup.py bdist_wheel

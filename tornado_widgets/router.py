@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 
-class Route(object):
+class Router(object):
 
     def __init__(self, *, prefix: str = ''):
         self.prefix = prefix
@@ -11,6 +11,6 @@ class Route(object):
         def decorator(handler_cls):
             if route in self.route_mapper:
                 raise BaseException('Duplicated Route!')
-            self.route_mapper[route] = handler_cls
+            self.route_mapper[self.prefix + route] = handler_cls
             return handler_cls
         return decorator
