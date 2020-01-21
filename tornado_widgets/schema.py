@@ -94,6 +94,11 @@ class LocalDateTimeField(DateTime):
             else:
                 value = value.replace(microsecond=0)
                 if value.tzinfo is None:
-                    value = value.replace(tzinfo=tzlocal())
+                    value = value.astimezone(tz=tzlocal())
         return super(LocalDateTimeField, self)._serialize(
             value, *args, **kwargs)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        result = super(LocalDateTimeField, self)._deserialize(
+            value, attr, data, **kwargs)
+        return result.astimezone(tz=tzlocal())
