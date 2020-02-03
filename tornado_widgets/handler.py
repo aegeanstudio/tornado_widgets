@@ -50,6 +50,9 @@ class BaseHandler(BaseRequestHandlerWithSentry):
         self.form_data: dict
         self.json_body: dict
 
+    def options(self):
+        self.set_status(204)
+
     def set_default_headers(self):
         # FIXME: Config Loader
         self.set_header('Access-Control-Allow-Origin', '*')
