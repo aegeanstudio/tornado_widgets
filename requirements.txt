@@ -22,6 +22,6 @@ python-dateutil==2.8.1
 pyyaml==5.3               # via apispec
 raven==6.10.0
 six==1.14.0               # via cryptography, python-dateutil
-sqlalchemy==1.3.12        # via databases
+sqlalchemy==1.3.13        # via databases
 tornado==6.0.3
 uvloop==0.14.0

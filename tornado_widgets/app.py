@@ -58,7 +58,6 @@ class App(object):
 
         class SwaggerHandler(JSONHandler):
             async def get(self):
-                print(spec.to_dict())
                 self.write(spec.to_dict())
         return SwaggerHandler
 
