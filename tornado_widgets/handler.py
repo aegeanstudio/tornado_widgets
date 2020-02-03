@@ -50,7 +50,8 @@ class BaseHandler(BaseRequestHandlerWithSentry):
         self.form_data: dict
         self.json_body: dict
 
-    def options(self):
+    def options(self, *args, **kwargs):
+        print(*args, **kwargs)
         self.set_status(204)
 
     def set_default_headers(self):
