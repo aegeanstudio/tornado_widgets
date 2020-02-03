@@ -8,7 +8,7 @@ from apispec import APISpec
 from apispec.exceptions import DuplicateComponentNameError
 from dateutil.tz import tzlocal
 from marshmallow.exceptions import MarshmallowError
-from marshmallow.fields import Field, DateTime
+from marshmallow.fields import String, DateTime
 from marshmallow.schema import BaseSchema
 
 from tornado_widgets.handler import JSONHandler
@@ -60,7 +60,7 @@ def schema(*, query_args: Type[BaseSchema] = None,
     return decorator
 
 
-class EnumField(Field):
+class EnumField(String):
 
     def __init__(self, enum_class, *args, **kwargs):
         super(EnumField, self).__init__(*args, **kwargs)
