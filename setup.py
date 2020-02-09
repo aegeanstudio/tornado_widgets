@@ -28,7 +28,7 @@ setup(
     author_email='wyqsmith@aegeanstudio.com',
     url='https://github.com/AeGean-Studio/tornado_widgets',
     license='BSD',
-    packages=find_packages(exclude=['tests', 'example']),
+    packages=find_packages(exclude=('tests*', 'example*')),
     install_requires=parse_requirements('requirements.txt'),
     setup_requires=['setuptools_scm'],
     python_requires='>=3.6',

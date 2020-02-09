@@ -7,6 +7,8 @@ import tornado.web
 from marshmallow import Schema
 from marshmallow.exceptions import MarshmallowError, ValidationError
 from raven.contrib.tornado import SentryMixin
+from tornado import httputil
+from tornado.options import options
 
 from tornado_widgets.error import BaseError
 
@@ -55,13 +57,13 @@ class BaseHandler(BaseRequestHandlerWithSentry):
         self.set_status(204)
 
     def set_default_headers(self):
-        # FIXME: Config Loader
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods',
-                        'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH')
-        self.set_header('Access-Control-Max-Age', '3600')
-        self.set_header('Access-Control-Allow-Headers',
-                        'Content-Type, Access-Control-Allow-Headers')
+        if options.debug:
+            self.set_header('Access-Control-Allow-Origin', '*')
+            self.set_header('Access-Control-Allow-Methods',
+                            'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH')
+            self.set_header('Access-Control-Max-Age', '3600')
+            self.set_header('Access-Control-Allow-Headers',
+                            'Content-Type, Access-Control-Allow-Headers')
 
     def get_headers(self):
         return dict(self.request.headers.get_all())
@@ -133,8 +135,25 @@ class JSONHandler(BaseHandler):
                     data=err_instance.data,
                     http_status=err_instance.http_status,
                 )
+            elif isinstance(err_instance, tornado.web.HTTPError):
+                self.write_json(
+                    code=err_instance.status_code,
+                    msg=err_instance.reason or httputil.responses.get(
+                        err_instance.status_code, 'Unknown'),
+                    data=None,
+                    http_status=err_instance.status_code,
+                )
             else:
                 self.write_json(**default)
         else:
             self.write_json(**default)
         self.finish()
+
+
+class WidgetsJSON404Handler(JSONHandler):
+
+    def initialize(self, status_code: int) -> None:
+        self.set_status(status_code)
+
+    def prepare(self) -> None:
+        raise tornado.web.HTTPError(self._status_code)

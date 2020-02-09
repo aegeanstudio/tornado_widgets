@@ -1,25 +1,34 @@
 # -*- coding: UTF-8 -*-
 
+import typing
+
 import tornado.web
 import tornado.ioloop
 from apispec import APISpec
 from raven.contrib.tornado import AsyncSentryClient
+from tornado.options import define, options
 
+from tornado_widgets.handler import WidgetsJSON404Handler
+from tornado_widgets.log import widgets_log_request
 from tornado_widgets.router import Router
 
 
 class App(object):
 
-    def __init__(self, *, name: str, config: object = None,
+    def __init__(self, *, name: str, config: typing.Any = None,
                  settings: dict = None):
+
         self.name = name
-        self.config = config
+        self._config_options(config=config)
+
         self.loop = None
         self.app = None
-        self.loggers = []
         self.settings = dict(
-            autoreload=config.DEBUG,
+            debug=options.debug,
             gzip=True,
+            log_function=widgets_log_request,
+            default_handler_class=WidgetsJSON404Handler,
+            default_handler_args=dict(status_code=404),
         )
         if settings:
             self.settings.update(**settings)
@@ -27,8 +36,13 @@ class App(object):
         self.routers = []
         self.spec = None
 
-    def register_logger(self, *, logger_class):
-        self.loggers.append(logger_class)
+    @staticmethod
+    def _config_options(*, config):
+        define(name='debug', default=config.DEBUG, type=bool)
+        define(name='port', default=config.PORT, type=int)
+        sentry_default = getattr(config, 'SENTRY_DSN', '')
+        define(name='sentry-dsn', default=sentry_default, type=str)
+        options.parse_command_line()
 
     def register_router(self, *, route_obj: Router):
         self.routers.append(route_obj)
@@ -38,9 +52,6 @@ class App(object):
 
     def register_prepare_func(self, *, func):
         self.prepare_funcs.append(func)
-
-    def log(self, *args, **kwargs):
-        pass
 
     @property
     def _route_as_list(self):
@@ -70,14 +81,12 @@ class App(object):
         for item in self.prepare_funcs:
             self.loop.run_sync(func=item)
         route_as_list = self._route_as_list
-        if self.config.DEBUG and self.spec:
+        if options.debug and self.spec:
             route_as_list.append(
                 ('/swagger.json',
                  self._gen_swagger_handler(routes=route_as_list)))
         self.app = tornado.web.Application(
             handlers=route_as_list, **self.settings)
-        if hasattr(self.config, 'SENTRY_DSN'):
-            self.app.sentry_client = AsyncSentryClient(
-                dsn=self.config.SENTRY_DSN)
-        self.app.listen(port=self.config.PORT)
+        self.app.sentry_client = AsyncSentryClient(dsn=options.sentry_dsn)
+        self.app.listen(port=options.port)
         self.loop.start()

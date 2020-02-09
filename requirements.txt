@@ -4,14 +4,12 @@
 #
 #    pip-compile requirements.in
 #
---index-url https://pypi.tuna.tsinghua.edu.cn/simple
-
 aiomysql==0.0.20          # via databases
 aioredis==1.3.1
 apispec-webframeworks==0.5.2
 apispec[yaml]==3.2.0      # via apispec-webframeworks
 async-timeout==3.0.1      # via aioredis
-cffi==1.13.2              # via cryptography
+cffi==1.14.0              # via cryptography
 cryptography==2.8         # via pymysql
 databases[mysql]==0.2.6
 hiredis==1.0.1            # via aioredis

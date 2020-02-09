@@ -31,7 +31,7 @@ def widgets_create_pool(
         'timeout', create_connection_timeout)
     if 'ssl' in options:
         assert options['ssl'] or (not options['ssl'] and not ssl), (
-                "Conflicting ssl options are set", options['ssl'], ssl)
+                'Conflicting ssl options are set', options['ssl'], ssl)
         ssl = ssl or options['ssl']
 
     return WidgetsRedisConnectionsPool(
@@ -41,7 +41,7 @@ def widgets_create_pool(
         connection_cls=RedisConnection)
 
 
-def generate_redis_decorator(pool_mapping: Dict[str, ConnectionsPool]):
+def generate_redis_decorator(*, pool_mapping: Dict[str, ConnectionsPool]):
 
     def redis_decorator(*, key: str):
         def decorator(func):
