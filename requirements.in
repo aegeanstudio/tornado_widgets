@@ -1,5 +1,6 @@
 aioredis
 apispec-webframeworks
+chardet
 databases[mysql]
 marshmallow
 python-dateutil

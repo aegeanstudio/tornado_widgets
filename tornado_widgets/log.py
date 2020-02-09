@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
-import json
 
-import chardet
+import json
 from random import randint
 from time import time
 
+import chardet
 from tornado.log import access_log
 from tornado.web import RequestHandler
 
@@ -27,7 +27,7 @@ def widgets_log_request(handler: RequestHandler):
     if query:
         log_method(f'[{random_nonce}] QUERY: {query}')
     content_type = handler.request.headers['Content-Type']
-    if content_type.startswith('multipart/form-data'):
+    if content_type.lower().startswith('multipart/form-data'):
         log_method(f'[{random_nonce}] BODY: **HIDDEN**')
     else:
         body = handler.request.body
