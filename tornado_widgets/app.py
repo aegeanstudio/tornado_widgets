@@ -9,7 +9,7 @@ from raven.contrib.tornado import AsyncSentryClient
 from tornado.options import define, options
 
 from tornado_widgets.handler import WidgetsJSON404Handler
-from tornado_widgets.log import widgets_log_request
+from tornado_widgets.log import widgets_default_log_request
 from tornado_widgets.router import Router
 
 
@@ -26,7 +26,7 @@ class App(object):
         self.settings = dict(
             debug=options.debug,
             gzip=True,
-            log_function=widgets_log_request,
+            log_function=widgets_default_log_request,
             default_handler_class=WidgetsJSON404Handler,
             default_handler_args=dict(status_code=404),
         )

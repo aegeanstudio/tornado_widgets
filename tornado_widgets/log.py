@@ -9,7 +9,7 @@ from tornado.log import access_log
 from tornado.web import RequestHandler
 
 
-def widgets_log_request(handler: RequestHandler):
+def widgets_default_log_request(handler: RequestHandler):
     if handler.get_status() < 400:
         log_method = access_log.info
     elif handler.get_status() < 500:
@@ -26,15 +26,20 @@ def widgets_log_request(handler: RequestHandler):
     query = handler.request.query
     if query:
         log_method(f'[{random_nonce}] QUERY: {query}')
-    content_type = handler.request.headers['Content-Type']
-    if content_type.lower().startswith('multipart/form-data'):
-        log_method(f'[{random_nonce}] BODY: **HIDDEN**')
-    else:
-        body = handler.request.body
-        if body:
-            encoding = chardet.detect(body)['encoding'] or 'utf-8'
+    if handler.request.method.upper() not in ('GET', 'OPTIONS'):
+        content_type = handler.request.headers.get('Content-Type', '')
+        if not content_type:
             log_method(f'[{random_nonce}] '
-                       f'BODY: {body.decode(encoding=encoding)}')
+                       f'BODY: **HIDDEN (Missing Content-Type)**')
+        elif content_type.lower().startswith('multipart/form-data'):
+            log_method(f'[{random_nonce}] '
+                       f'BODY: **HIDDEN (multipart/form-data Detected)**')
+        else:
+            body = handler.request.body
+            if body:
+                encoding = chardet.detect(body)['encoding'] or 'utf-8'
+                log_method(f'[{random_nonce}] '
+                           f'BODY: {body.decode(encoding=encoding)}')
 
     log_method(
         f'[{random_nonce}] ' '%d %s %.2fms',

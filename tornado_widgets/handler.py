@@ -8,6 +8,7 @@ from marshmallow import Schema
 from marshmallow.exceptions import MarshmallowError, ValidationError
 from raven.contrib.tornado import SentryMixin
 from tornado import httputil
+from tornado.log import access_log
 from tornado.options import options
 
 from tornado_widgets.error import BaseError
@@ -53,7 +54,7 @@ class BaseHandler(BaseRequestHandlerWithSentry):
         self.json_body: dict
 
     def options(self, *args, **kwargs):
-        print(*args, **kwargs)
+        access_log.info('OPTIONS CALLED: %s, %s', args, kwargs)
         self.set_status(204)
 
     def set_default_headers(self):

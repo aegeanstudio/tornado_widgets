@@ -2,9 +2,8 @@
 
 from marshmallow import Schema, fields
 
-from tornado_widgets.handler import JSONHandler
-
 from example.handlers import router, spec
+from tornado_widgets.handler import JSONHandler
 from tornado_widgets.schema import schema
 
 
