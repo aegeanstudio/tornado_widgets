@@ -2,35 +2,33 @@
 
 import functools
 from datetime import date, datetime
-from typing import Type
 
 from apispec import APISpec
 from apispec.exceptions import DuplicateComponentNameError
 from dateutil.tz import tzlocal
 from marshmallow.exceptions import MarshmallowError
 from marshmallow.fields import String, DateTime
-from marshmallow.schema import BaseSchema
+from marshmallow.schema import Schema
 
 from tornado_widgets.handler import JSONHandler
 
 
 def _generate_schema_func(
-        *, schema_src_inner: str, schema_object_inner: BaseSchema):
+        *, schema_src_inner: str, schema_object_inner: Schema):
     return lambda handler_obj: getattr(handler_obj, f'get_{schema_src_inner}')(
         schema=schema_object_inner)
 
 
-def schema(*, query_args: Type[BaseSchema] = None,
-           form_data: Type[BaseSchema] = None,
-           json_body: Type[BaseSchema] = None,
-           res: Type[BaseSchema] = None,
+def schema(*, query_args: Schema = None, form_data: Schema = None,
+           json_body: Schema = None, res: Schema = None,
            reg_to: APISpec = None):
 
     if reg_to:
         for item in (query_args, form_data, json_body, res):
             if item:
                 try:
-                    reg_to.components.schema(name=item.__name__, schema=item)
+                    reg_to.components.schema(
+                        name=item.__class__.__name__, schema=item.__class__)
                 except DuplicateComponentNameError as e:
                     print(e)
 
@@ -40,12 +38,9 @@ def schema(*, query_args: Type[BaseSchema] = None,
         json_body=json_body,
     )
 
-    for schema_src, schema_class in schema_pairs.items():
-        schema_object = schema_class() if schema_class else None
+    for schema_src, schema_object in schema_pairs.items():
         schema_pairs[schema_src] = _generate_schema_func(
             schema_src_inner=schema_src, schema_object_inner=schema_object)
-
-    res = res() if res else None
 
     def decorator(func):
         @functools.wraps(func)

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, EXCLUDE
 
 from example.handlers import router, spec
 from tornado_widgets.handler import JSONHandler
@@ -18,7 +18,8 @@ class ResponseTestAPI(Schema):
 @router.route(route='/test')
 class TestHandler(JSONHandler):
 
-    @schema(query_args=RequestTestAPI, res=ResponseTestAPI, reg_to=spec)
+    @schema(query_args=RequestTestAPI(unknown=EXCLUDE), res=ResponseTestAPI(),
+            reg_to=spec)
     async def get(self):
         """---
         description:
