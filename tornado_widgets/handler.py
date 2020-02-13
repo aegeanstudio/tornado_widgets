@@ -103,8 +103,9 @@ class JSONHandler(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def write_json(self, data=None, code: int = 0, msg: str = None,
+    def write_json(self, data=None, code: int = None, msg: str = None,
                    http_status: int = 200, schema: Schema = None):
+        code = code if code is not None else options.widgets_success_code
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
         self.set_status(http_status)
         if schema:

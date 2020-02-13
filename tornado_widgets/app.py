@@ -42,6 +42,9 @@ class App(object):
         define(name='port', default=config.PORT, type=int)
         sentry_default = getattr(config, 'SENTRY_DSN', '')
         define(name='sentry-dsn', default=sentry_default, type=str)
+        widgets_success_code = getattr(config, 'WIDGETS_SUCCESS_CODE', 0)
+        define(name='widgets-success-code', default=widgets_success_code,
+               type=int)
         options.parse_command_line()
 
     def register_router(self, *, route_obj: Router):
