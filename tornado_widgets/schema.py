@@ -48,6 +48,9 @@ def schema(*, query_args: Schema = None, form_data: Schema = None,
             for sch_src, sch_func in schema_pairs.items():
                 setattr(self, sch_src, sch_func(self))
             result = await func(self, *args, **kwargs)
+            if isinstance(result, tuple):
+                result, extra = result[:2]
+                self.set_extra(extra=extra)
             if res:
                 result = res.dump(result)
             self.write_json(data=result)

@@ -102,15 +102,21 @@ class JSONHandler(BaseHandler):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.widgets_extra = dict()
 
-    def write_json(self, data=None, code: int = None, msg: str = None,
-                   http_status: int = 200, schema: Schema = None):
+    def set_extra(self, *, extra: dict = None):
+        if extra:
+            self.widgets_extra.update(**extra)
+
+    def write_json(self, data: dict = None, code: int = None, msg: str = None,
+                   http_status: int = 200):
         code = code if code is not None else options.widgets_success_code
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
         self.set_status(http_status)
-        if schema:
-            data = schema.dump(data)
-        self.write(dict(code=code, msg=msg, data=data))
+        result = dict(code=code, msg=msg, data=data, _extra=self.widgets_extra)
+        if (not options.widgets_force_extra) and (not self.widgets_extra):
+            del result['_extra']
+        self.write(result)
 
     def write_error(self, status_code: int, **kwargs):
         default = dict(

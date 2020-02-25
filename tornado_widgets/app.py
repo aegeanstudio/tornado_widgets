@@ -45,6 +45,9 @@ class App(object):
         widgets_success_code = getattr(config, 'WIDGETS_SUCCESS_CODE', 0)
         define(name='widgets-success-code', default=widgets_success_code,
                type=int)
+        widgets_force_extra = getattr(config, 'WIDGETS_FORCE_EXTRA', False)
+        define(name='widgets-force-extra', default=widgets_force_extra,
+               type=bool)
         options.parse_command_line()
 
     def register_router(self, *, route_obj: Router):
