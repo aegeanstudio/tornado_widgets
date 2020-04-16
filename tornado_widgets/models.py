@@ -5,7 +5,7 @@ from databases.core import Connection
 from tornado_widgets.utils import fix_utc
 
 
-class BaseModel(object):
+class MySQLBaseModel(object):
 
     _table: str = ''
     _fields: tuple = ()
