@@ -31,7 +31,7 @@ def widgets_create_pool(
         'timeout', create_connection_timeout)
     if 'ssl' in options:
         assert options['ssl'] or (not options['ssl'] and not ssl), (
-                'Conflicting ssl options are set', options['ssl'], ssl)
+            'Conflicting ssl options are set', options['ssl'], ssl)
         ssl = ssl or options['ssl']
 
     return WidgetsRedisConnectionsPool(

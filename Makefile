@@ -2,15 +2,15 @@ WITH_ENV = env `cat .env 2>/dev/null | xargs`
 
 compile-deps:
 	@[ -n "$(VIRTUAL_ENV)" ] || (echo 'out of virtualenv'; exit 1)
-	@$(WITH_ENV) pip3 install -U pip setuptools wheel
-	@$(WITH_ENV) pip3 install -U pip-tools
-	@$(WITH_ENV) pip-compile -U requirements.in
-	@$(WITH_ENV) pip-compile -U requirements.in requirements-test.in --output-file=requirements-dev.txt
+	@$(WITH_ENV) pip install -U pip setuptools wheel
+	@$(WITH_ENV) pip install -U pip-tools
+	@$(WITH_ENV) pip-compile -U requires/requirements.in requires/postgres.in requires/redis.in requires/dev.in --output-file requirements.txt
 
 install-deps:
 	@[ -n "$(VIRTUAL_ENV)" ] || (echo 'out of virtualenv'; exit 1)
-	@$(WITH_ENV) pip3 install -U pip setuptools wheel
-	@$(WITH_ENV) pip3 install -r requirements-dev.txt
+	@$(WITH_ENV) pip install -U pip setuptools wheel
+	@$(WITH_ENV) pip install -U pip-tools
+	@$(WITH_ENV) pip-sync requirements.txt
 
 clean:
 	@rm -rf dist/*
@@ -25,4 +25,4 @@ lint:
 
 dist: clean
 	@[ -n "$(VIRTUAL_ENV)" ] || (echo 'out of virtualenv'; exit 1)
-	@$(WITH_ENV) python3 ./setup.py bdist_wheel
+	@$(WITH_ENV) python setup.py bdist_wheel
