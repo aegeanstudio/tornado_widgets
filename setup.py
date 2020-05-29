@@ -19,6 +19,7 @@ REQUIREMENTS = _read_requires(filename='requirements.in')
 
 EXTRAS_REQUIRE = dict(
     postgres=_read_requires(filename='postgres.in'),
+    mysql=_read_requires(filename='mysql.in'),
     redis=_read_requires(filename='redis.in'),
 )
 

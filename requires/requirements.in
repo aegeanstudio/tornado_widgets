@@ -2,5 +2,6 @@ apispec-webframeworks
 chardet
 marshmallow
 python-dateutil
+raven
 tornado
 uvloop

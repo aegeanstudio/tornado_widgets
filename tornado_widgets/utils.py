@@ -7,6 +7,15 @@ from enum import Enum
 from dateutil.tz import tzlocal, tzutc
 
 
+class PrintMixin(object):
+
+    def __repr__(self):
+        return '<{class_name}({props})>'.format(
+            class_name=self.__class__.__name__,
+            props=','.join(
+                ['{}={}'.format(k, v) for k, v in self.__dict__.items()]))
+
+
 def now_with_tz():
     return datetime.now(tz=tzlocal())
 
