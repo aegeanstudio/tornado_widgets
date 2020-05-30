@@ -33,7 +33,7 @@ def create_base_model(*, db: Gino):
         id_ = Column(
             name='id', type_=sqltypes.BigInteger(), primary_key=True,
             nullable=False, autoincrement=True)
-        _is_deleted = Column(
+        is_deleted = Column(
             name='is_deleted', type_=sqltypes.Boolean(), nullable=False,
             index=True, server_default='f')
         create_time = Column(
@@ -46,6 +46,13 @@ def create_base_model(*, db: Gino):
 
         def __init__(self, *args, **kwargs):
             super(_WidgetsPostgresBaseModel, self).__init__(*args, **kwargs)
+
+        def __repr__(self):
+            return '<{class_name}({props})>'.format(
+                class_name=self.__class__.__name__,
+                props=','.join(
+                    ['{}={}'.format(k, v)
+                     for k, v in self.__values__.items()]))
 
     return _WidgetsPostgresBaseModel
 
