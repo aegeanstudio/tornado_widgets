@@ -11,6 +11,9 @@ from sqlalchemy.sql import sqltypes
 from tornado_widgets.utils import PrintMixin
 
 
+DEFAULT_ZERO_DATETIME = '1970-01-01T00:00:00.000000+00:00'
+
+
 def create_postgres(*, url, **kwargs):
     engine = create_engine(url, pool_class=NullPool, **kwargs)
     if isinstance(engine, Coroutine):
