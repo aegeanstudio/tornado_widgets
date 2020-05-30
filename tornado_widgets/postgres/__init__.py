@@ -4,7 +4,7 @@ import functools
 from typing import Coroutine
 
 from gino import create_engine, Gino
-from gino.dialects.asyncpg import NullPool
+from sqlalchemy import func
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql import sqltypes
 
@@ -15,7 +15,7 @@ DEFAULT_ZERO_DATETIME = '1970-01-01T00:00:00.000000+00:00'
 
 
 def create_postgres(*, url, **kwargs):
-    engine = create_engine(url, pool_class=NullPool, **kwargs)
+    engine = create_engine(url, **kwargs)
     if isinstance(engine, Coroutine):
         engine.close()
         return Gino(bind=url)
@@ -23,7 +23,7 @@ def create_postgres(*, url, **kwargs):
 
 
 async def set_engine(*, db: Gino, url, **kwargs):
-    engine = await create_engine(url, pool_class=NullPool, **kwargs)
+    engine = await create_engine(url, **kwargs)
     db.bind = engine
 
 
@@ -45,7 +45,7 @@ def create_base_model(*, db: Gino):
         update_time = Column(
             name='update_time', type_=sqltypes.DateTime(timezone=True),
             nullable=False, index=True, server_default='NOW()',
-            server_onupdate='NOW()')
+            server_onupdate=func.current_timestamp())
 
         def __init__(self, *args, **kwargs):
             super(_WidgetsPostgresBaseModel, self).__init__(*args, **kwargs)
