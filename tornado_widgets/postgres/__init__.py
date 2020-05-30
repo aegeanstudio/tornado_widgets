@@ -1,10 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 import functools
-from typing import Coroutine
 
 from gino import create_engine, Gino
-from sqlalchemy import func
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql import sqltypes
 
@@ -15,19 +13,21 @@ DEFAULT_ZERO_DATETIME = '1970-01-01T00:00:00.000000+00:00'
 
 
 def create_postgres(*, url, **kwargs):
+    from sqlalchemy import create_engine
     engine = create_engine(url, **kwargs)
-    if isinstance(engine, Coroutine):
-        engine.close()
-        return Gino(bind=url)
     return Gino(bind=engine)
 
 
-async def set_engine(*, db: Gino, url, **kwargs):
-    engine = await create_engine(url, **kwargs)
-    db.bind = engine
+def generate_asyncpg_engine_setter(*, db: Gino, url, pool_size, **kwargs):
+    async def _set():
+        db.bind = await create_engine(
+            url, min_size=pool_size, max_size=pool_size, **kwargs)
+    return _set
 
 
 def create_base_model(*, db: Gino):
+
+    from sqlalchemy import func
 
     class _WidgetsPostgresBaseModel(db.Model, PrintMixin):
 
