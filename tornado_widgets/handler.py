@@ -103,6 +103,7 @@ class JSONHandler(BaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.widgets_extra = dict()
+        self.json_result = None
 
     def set_extra(self, *, extra: dict = None):
         if extra:
@@ -116,6 +117,7 @@ class JSONHandler(BaseHandler):
         result = dict(code=code, msg=msg, data=data, _extra=self.widgets_extra)
         if (not options.widgets_force_extra) and (not self.widgets_extra):
             del result['_extra']
+        self.json_result = result
         self.write(result)
 
     def write_error(self, status_code: int, **kwargs):

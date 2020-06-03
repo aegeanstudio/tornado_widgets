@@ -14,8 +14,7 @@ DEFAULT_ZERO_DATETIME = '1970-01-01T00:00:00.000000+00:00'
 
 def create_postgres(*, url, **kwargs):
     from sqlalchemy import create_engine
-    engine = create_engine(url, **kwargs)
-    return Gino(bind=engine)
+    return Gino(bind=create_engine(url, **kwargs))
 
 
 def generate_asyncpg_engine_setter(*, db: Gino, url, pool_size, **kwargs):
