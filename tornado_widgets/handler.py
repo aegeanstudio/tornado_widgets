@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import json
-from typing import Optional, Awaitable
+from typing import Optional, Awaitable, Callable
 
 import tornado.web
 from marshmallow import Schema
@@ -48,10 +48,10 @@ class BaseHandler(BaseRequestHandlerWithSentry):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.headers: dict
-        self.query_args: dict
-        self.form_data: dict
-        self.json_body: dict
+        self.headers = dict()
+        self.query_args = dict()
+        self.form_data = dict()
+        self.json_body = dict()
 
     def options(self, *args, **kwargs):
         access_log.info('OPTIONS CALLED: %s, %s', args, kwargs)
@@ -96,6 +96,13 @@ class BaseHandler(BaseRequestHandlerWithSentry):
         if schema:
             return schema.load(result)
         return result
+
+    def widgets_get_argument(self, key, casting_func: Callable = None):
+        source = ['query_args', 'form_data', 'json_body']
+        for s in source:
+            value = getattr(self, s, dict()).get(key)
+            if value:
+                return casting_func(value)
 
 
 class JSONHandler(BaseHandler):
