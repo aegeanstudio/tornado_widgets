@@ -1,6 +1,7 @@
 apispec-webframeworks
 chardet
 marshmallow
+orjson
 python-dateutil
 raven
 tornado

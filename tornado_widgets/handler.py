@@ -3,6 +3,7 @@
 import json
 from typing import Optional, Awaitable, Callable
 
+import orjson
 import tornado.web
 from marshmallow import Schema
 from marshmallow.exceptions import MarshmallowError, ValidationError
@@ -92,7 +93,7 @@ class BaseHandler(BaseRequestHandlerWithSentry):
             return dict()
         if not content_type.startswith('application/json'):
             return dict()
-        result = json.loads(self.request.body or '{}')
+        result = orjson.loads(self.request.body or '{}')
         if schema:
             return schema.load(result)
         return result
@@ -125,7 +126,9 @@ class JSONHandler(BaseHandler):
         if (not options.widgets_force_extra) and (not self.widgets_extra):
             del result['_extra']
         self.json_result = result
-        self.write(result)
+        result_bytes = orjson.dumps(result).replace(b'</', b'<\\/')
+        self.set_header("Content-Type", "application/json; charset=UTF-8")
+        self.write(result_bytes)
 
     def write_error(self, status_code: int, **kwargs):
         default = dict(
