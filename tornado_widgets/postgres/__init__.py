@@ -3,6 +3,7 @@
 import functools
 
 from gino import create_engine, Gino
+from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql import sqltypes
 
@@ -40,11 +41,13 @@ def create_base_model(*, db: Gino):
             index=True, server_default='f')
         create_time = Column(
             name='create_time', type_=sqltypes.DateTime(timezone=True),
-            nullable=False, index=True, server_default='NOW()')
+            nullable=False, index=True,
+            server_default=text('CURRENT_TIMESTAMP'))
         update_time = Column(
             name='update_time', type_=sqltypes.DateTime(timezone=True),
-            nullable=False, index=True, server_default='NOW()',
-            server_onupdate=func.current_timestamp())
+            nullable=False, index=True,
+            server_default=text('CURRENT_TIMESTAMP'),
+            server_onupdate=text('CURRENT_TIMESTAMP'))
 
         def __init__(self, *args, **kwargs):
             super(_WidgetsPostgresBaseModel, self).__init__(*args, **kwargs)
