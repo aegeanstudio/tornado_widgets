@@ -27,8 +27,6 @@ def generate_asyncpg_engine_setter(*, db: Gino, url, pool_size, **kwargs):
 
 def create_base_model(*, db: Gino):
 
-    from sqlalchemy import func
-
     class _WidgetsPostgresBaseModel(db.Model, PrintMixin):
 
         __abstract__ = True

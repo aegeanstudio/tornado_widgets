@@ -90,9 +90,7 @@ class LocalDateTimeField(DateTime):
                 value = datetime(value.year, value.month, value.day,
                                  tzinfo=tzlocal())
             else:
-                value = value.replace(microsecond=0)
-                if value.tzinfo is None:
-                    value = value.astimezone(tz=tzlocal())
+                value = value.replace(microsecond=0).astimezone(tz=tzlocal())
         return super(LocalDateTimeField, self)._serialize(
             value, *args, **kwargs)
 

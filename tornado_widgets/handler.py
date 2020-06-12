@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 
-import json
 from typing import Optional, Awaitable, Callable
 
 import orjson
@@ -127,7 +126,7 @@ class JSONHandler(BaseHandler):
             del result['_extra']
         self.json_result = result
         result_bytes = orjson.dumps(result).replace(b'</', b'<\\/')
-        self.set_header("Content-Type", "application/json; charset=UTF-8")
+        self.set_header('Content-Type', 'application/json; charset=UTF-8')
         self.write(result_bytes)
 
     def write_error(self, status_code: int, **kwargs):
