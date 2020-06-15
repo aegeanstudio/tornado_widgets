@@ -1,7 +1,9 @@
 # -*- coding: UTF-8 -*-
 
+from tornado_widgets.utils import PrintMixin
 
-class Router(object):
+
+class Router(PrintMixin):
 
     def __init__(self, *, prefix: str = ''):
         self.prefix = prefix

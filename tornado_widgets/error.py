@@ -12,13 +12,15 @@ class BaseError(Exception):
     _error = ErrorMeta(1000, '内部错误', None, 500, True)
 
     def __init__(self, code: int = None, msg: str = None, data: dict = None,
-                 http_status: int = None, alert_sentry: bool = False):
+                 http_status: int = None, alert_sentry: bool = None):
         super(BaseError, self).__init__()
         self.code = code or self._error.code
         self.msg = msg or self._error.msg
         self.data = data or self._error.data
         self.http_status = http_status or self._error.http_status
-        self.alert_sentry = alert_sentry or self._error.alert_sentry
+        self.alert_sentry = (alert_sentry
+                             if alert_sentry is not None
+                             else self._error.alert_sentry)
         args = dict(
             code=self.code,
             msg=self.msg,
@@ -38,3 +40,7 @@ class BaseError(Exception):
             props=','.join(
                 ['{}={}'.format(k, f'"{v}"' if isinstance(v, str) else v)
                  for k, v in self.__dict__.items()]))
+
+
+class WidgetsParameterError(BaseError):
+    _error = ErrorMeta(1001, '参数异常', None, 400, False)

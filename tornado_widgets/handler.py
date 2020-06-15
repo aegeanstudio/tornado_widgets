@@ -6,45 +6,17 @@ import orjson
 import tornado.web
 from marshmallow import Schema
 from marshmallow.exceptions import MarshmallowError, ValidationError
-from raven.contrib.tornado import SentryMixin
 from tornado import httputil
 from tornado.log import access_log
 from tornado.options import options
 
-from tornado_widgets.error import BaseError
+from tornado_widgets.error import BaseError, WidgetsParameterError
 
 
-class BaseRequestHandlerWithSentry(tornado.web.RequestHandler, SentryMixin):
+class BaseHandler(tornado.web.RequestHandler):
 
     def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
-        pass
-
-    def get_sentry_user_info(self):
-        try:
-            user = self._current_user
-        except Exception:
-            return dict()
-        return dict(
-            user=dict(
-                is_authenticated=bool(user),
-                info=user,
-            ),
-        )
-
-    def log_exception(self, typ, value, tb):
-        rv = super(BaseRequestHandlerWithSentry, self).log_exception(
-            typ, value, tb)
-        if isinstance(value, BaseError):
-            if value.http_status != 500:
-                if not value.alert_sentry:
-                    return rv
-        if isinstance(value, MarshmallowError):
-            return rv
-        self.captureException(exc_info=(typ, value, tb))
-        return rv
-
-
-class BaseHandler(BaseRequestHandlerWithSentry):
+        raise NotImplemented    # NOQA
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,7 +64,10 @@ class BaseHandler(BaseRequestHandlerWithSentry):
             return dict()
         if not content_type.startswith('application/json'):
             return dict()
-        result = orjson.loads(self.request.body or '{}')
+        try:
+            result = orjson.loads(self.request.body or '{}')
+        except orjson.JSONDecodeError:
+            raise WidgetsParameterError
         if schema:
             return schema.load(result)
         return result

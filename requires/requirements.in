@@ -1,8 +1,8 @@
 apispec-webframeworks
 chardet
-marshmallow
+marshmallow>=3
 orjson
 python-dateutil
-raven
-tornado
+sentry-sdk
+tornado>=6.0
 uvloop

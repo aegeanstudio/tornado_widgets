@@ -2,15 +2,16 @@
 
 import typing
 
+import sentry_sdk
 import tornado.web
 import tornado.ioloop
 from apispec import APISpec
-from raven.contrib.tornado import AsyncSentryClient
 from tornado.options import define, options
 
 from tornado_widgets.handler import WidgetsJSON404Handler
 from tornado_widgets.log import widgets_default_log_request
 from tornado_widgets.router import Router
+from tornado_widgets.sentry import TornadoWidgetsIntegration
 
 
 class App(object):
@@ -40,8 +41,8 @@ class App(object):
     def _config_options(*, config):
         define(name='debug', default=config.DEBUG, type=bool)
         define(name='port', default=config.PORT, type=int)
-        sentry_default = getattr(config, 'SENTRY_DSN', '')
-        define(name='sentry-dsn', default=sentry_default, type=str)
+        sentry_default = getattr(config, 'WIDGETS_SENTRY_DSN', '')
+        define(name='widgets-sentry-dsn', default=sentry_default, type=str)
         widgets_success_code = getattr(config, 'WIDGETS_SUCCESS_CODE', 0)
         define(name='widgets-success-code', default=widgets_success_code,
                type=int)
@@ -93,6 +94,10 @@ class App(object):
                  self._gen_swagger_handler(routes=route_as_list)))
         self.app = tornado.web.Application(
             handlers=route_as_list, **self.settings)
-        self.app.sentry_client = AsyncSentryClient(dsn=options.sentry_dsn)
         self.app.listen(port=options.port)
+        sentry_dsn = options.widgets_sentry_dsn
+        if sentry_dsn:
+            sentry_sdk.init(
+                dsn=sentry_dsn, integrations=[TornadoWidgetsIntegration()],
+                default_integrations=False)
         self.loop.start()
