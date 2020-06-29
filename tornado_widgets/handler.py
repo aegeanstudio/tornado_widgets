@@ -25,11 +25,11 @@ class BaseHandler(tornado.web.RequestHandler):
         self.form_data = dict()
         self.json_body = dict()
 
-    def options(self, *args, **kwargs):
+    def options(self, *args, **kwargs) -> None:
         access_log.info('OPTIONS CALLED: %s, %s', args, kwargs)
         self.set_status(204)
 
-    def set_default_headers(self):
+    def set_default_headers(self) -> None:
         if options.debug:
             self.set_header('Access-Control-Allow-Origin', '*')
             self.set_header('Access-Control-Allow-Methods',
@@ -38,11 +38,11 @@ class BaseHandler(tornado.web.RequestHandler):
             self.set_header('Access-Control-Allow-Headers',
                             'Content-Type, Access-Control-Allow-Headers')
 
-    def get_headers(self):
+    def get_headers(self) -> dict:
         return dict(self.request.headers.get_all())
 
     @staticmethod
-    def _decode(*, src, schema: Schema = None):
+    def _decode(*, src, schema: Schema = None) -> dict:
         result = dict()
         for key, value in src.items():
             result[key] = [item.decode() for item in value]
@@ -87,12 +87,12 @@ class JSONHandler(BaseHandler):
         self.widgets_extra = dict()
         self.json_result = None
 
-    def set_extra(self, *, extra: dict = None):
+    def set_extra(self, *, extra: dict = None) -> None:
         if extra:
             self.widgets_extra.update(**extra)
 
     def write_json(self, data: dict = None, code: int = None, msg: str = None,
-                   http_status: int = 200):
+                   http_status: int = 200) -> None:
         code = code if code is not None else options.widgets_success_code
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
         self.set_status(http_status)
@@ -100,11 +100,14 @@ class JSONHandler(BaseHandler):
         if (not options.widgets_force_extra) and (not self.widgets_extra):
             del result['_extra']
         self.json_result = result
-        result_bytes = orjson.dumps(result).replace(b'</', b'<\\/')
+        result_bytes = orjson.dumps(
+            result, option=(orjson.OPT_SORT_KEYS | orjson.OPT_STRICT_INTEGER),
+        ).replace(b'</', b'<\\/')
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
         self.write(result_bytes)
+        self.finish()
 
-    def write_error(self, status_code: int, **kwargs):
+    def write_error(self, status_code: int, **kwargs) -> None:
         default = dict(
             code=1000,
             msg='内部错误',

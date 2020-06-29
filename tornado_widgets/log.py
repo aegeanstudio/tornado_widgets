@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
 
-import json
 from random import randint
 from time import time
 
 import chardet
+import orjson
 from tornado.log import access_log
 from tornado.web import RequestHandler
 
@@ -20,9 +20,11 @@ def widgets_default_log_request(handler: RequestHandler):
 
     random_nonce = f'{randint(0, 0xFFFFF):05X}{int(time() * 1e3):011X}'
 
-    headers = json.dumps(dict(handler.request.headers.get_all()))
+    headers = orjson.dumps(
+        dict(handler.request.headers.get_all()),
+        option=orjson.OPT_SORT_KEYS | orjson.OPT_STRICT_INTEGER)
     if headers:
-        log_method(f'[{random_nonce}] HEADERS: {headers}')
+        log_method(f'[{random_nonce}] HEADERS: {headers.decode()}')
     query = handler.request.query
     if query:
         log_method(f'[{random_nonce}] QUERY: {query}')
