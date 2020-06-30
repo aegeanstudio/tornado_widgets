@@ -144,7 +144,6 @@ class JSONHandler(BaseHandler):
                 self.write_json(**default)
         else:
             self.write_json(**default)
-        self.finish()
 
 
 class WidgetsJSON404Handler(JSONHandler):
