@@ -40,8 +40,15 @@ def widgets_default_log_request(handler: RequestHandler):
             body = handler.request.body
             if body:
                 encoding = chardet.detect(body)['encoding'] or 'utf-8'
-                log_method(f'[{random_nonce}] '
-                           f'BODY: {body.decode(encoding=encoding)}')
+                try:
+                    log_method(f'[{random_nonce}] '
+                               f'BODY: {body.decode(encoding=encoding)}')
+                except UnicodeDecodeError:
+                    try:
+                        log_method(f'[{random_nonce}] BODY: {body.decode()}')
+                    except UnicodeDecodeError:
+                        log_method(f'[{random_nonce}] '
+                                   f'BODY: **HIDDEN (UnicodeDecodeError)**')
 
     log_method(
         f'[{random_nonce}] ' '%d %s %.2fms',
