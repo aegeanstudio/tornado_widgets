@@ -21,7 +21,7 @@ EXTRAS_REQUIRE = dict(
     postgres=_read_requires(filename='postgres.in'),
     mysql=_read_requires(filename='mysql.in'),
     redis=_read_requires(filename='redis.in'),
-    stat_influxdb=_read_requires(filename='stat_influxdb.in'),
+    influxdb=_read_requires(filename='influxdb.in'),
 )
 
 

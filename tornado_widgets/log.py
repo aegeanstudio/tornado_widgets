@@ -5,13 +5,20 @@ from time import time
 
 import chardet
 import orjson
-from influxdb import InfluxDBClient
 from tornado.options import options
 from tornado.log import access_log, app_log
 from tornado.web import RequestHandler
 
+try:
+    from influxdb import InfluxDBClient
+except ImportError:
+    app_log.warning(
+        'The InfluxDB Python Driver not installed. '
+        'Widgets Simple Stat InfluxDB Module will NEVER be loaded.')
+    InfluxDBClient = None
 
-def _simple_stat_influxdb(app_name, handler):
+
+def _simple_stat_influxdb(app_name, handler, random_nonce):
     _influxdb = getattr(_simple_stat_influxdb, '_influxdb', None)
     if not _influxdb:
         _influxdb = InfluxDBClient.from_dsn(
@@ -36,6 +43,7 @@ def _simple_stat_influxdb(app_name, handler):
             status=handler.get_status(),
         ),
         fields=dict(
+            random_nonce=random_nonce,
             ip=handler.request.remote_ip,
             latency=handler.request.request_time(),
         ),
@@ -94,7 +102,8 @@ def generate_widgets_default_log_request(app_name: str):
             request_time,
         )
 
-        if options.widgets_simple_stat_influxdb_dsn:
-            _simple_stat_influxdb(app_name=app_name, handler=handler)
+        if InfluxDBClient and options.widgets_simple_stat_influxdb_dsn:
+            _simple_stat_influxdb(
+                app_name=app_name, handler=handler, random_nonce=random_nonce)
 
     return log_request
