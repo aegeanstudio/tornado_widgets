@@ -9,7 +9,7 @@ from apispec import APISpec
 from tornado.options import define, options
 
 from tornado_widgets.handler import WidgetsJSON404Handler
-from tornado_widgets.log import widgets_default_log_request
+from tornado_widgets.log import generate_widgets_default_log_request
 from tornado_widgets.router import Router
 from tornado_widgets.sentry import TornadoWidgetsIntegration
 
@@ -23,11 +23,12 @@ class App(object):
         self._config_options(config=config)
 
         self.loop = None
-        self.app = None
+        self.application = None
         self.settings = dict(
             debug=options.debug,
             gzip=True,
-            log_function=widgets_default_log_request,
+            log_function=generate_widgets_default_log_request(
+                app_name=self.name),
             default_handler_class=WidgetsJSON404Handler,
             default_handler_args=dict(status_code=404),
         )
@@ -49,6 +50,10 @@ class App(object):
         widgets_force_extra = getattr(config, 'WIDGETS_FORCE_EXTRA', False)
         define(name='widgets-force-extra', default=widgets_force_extra,
                type=bool)
+        widgets_simple_stat_influxdb_dsn = getattr(
+            config, 'WIDGETS_SIMPLE_STAT_INFLUXDB_DSN', '')
+        define(name='widgets-simple-stat-influxdb-dsn',
+               default=widgets_simple_stat_influxdb_dsn, type=str)
         options.parse_command_line()
 
     def register_router(self, *, route_obj: Router):
@@ -92,9 +97,9 @@ class App(object):
             route_as_list.append(
                 ('/swagger.json',
                  self._gen_swagger_handler(routes=route_as_list)))
-        self.app = tornado.web.Application(
+        self.application = tornado.web.Application(
             handlers=route_as_list, **self.settings)
-        self.app.listen(port=options.port)
+        self.application.listen(port=options.port)
         sentry_dsn = options.widgets_sentry_dsn
         if sentry_dsn:
             sentry_sdk.init(

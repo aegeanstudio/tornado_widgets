@@ -4,7 +4,7 @@ compile-deps:
 	@[ -n "$(VIRTUAL_ENV)" ] || (echo 'out of virtualenv'; exit 1)
 	@$(WITH_ENV) pip install -U pip setuptools wheel
 	@$(WITH_ENV) pip install -U pip-tools
-	@$(WITH_ENV) pip-compile -U requires/requirements.in requires/postgres.in requires/mysql.in requires/redis.in requires/dev.in --output-file requirements.txt
+	@$(WITH_ENV) pip-compile -U requires/requirements.in requires/postgres.in requires/mysql.in requires/redis.in requires/stat_influxdb.in requires/dev.in --output-file requirements.txt
 
 install-deps:
 	@[ -n "$(VIRTUAL_ENV)" ] || (echo 'out of virtualenv'; exit 1)

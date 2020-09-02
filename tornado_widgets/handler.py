@@ -65,7 +65,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if not content_type.startswith('application/json'):
             return dict()
         try:
-            result = orjson.loads(self.request.body or '{}')
+            result = orjson.loads(self.request.body or b'{}')
         except orjson.JSONDecodeError:
             raise WidgetsParameterError
         if schema:
