@@ -1,17 +1,20 @@
 # -*- coding: UTF-8 -*-
 
+import asyncio
 import functools
 from typing import Dict
 
-from aioredis.connection import RedisConnection
 from aioredis.commands import Redis
+from aioredis.locks import Lock
 from aioredis.pool import ConnectionsPool
-from aioredis.util import parse_url
+from aioredis.util import CloseEvent, parse_url
 
 
 class WidgetsRedisConnectionsPool(ConnectionsPool):
 
     async def connect(self):
+        self._cond = asyncio.Condition(lock=Lock())
+        self._close_state = CloseEvent(self._do_close)
         try:
             await self._fill_free(override_min=False)
         except Exception:
@@ -22,7 +25,7 @@ class WidgetsRedisConnectionsPool(ConnectionsPool):
 
 def widgets_create_pool(
         *, address, db=None, password=None, ssl=None, encoding=None, size=8,
-        parser=None, create_connection_timeout=None):
+        create_connection_timeout=None):
     address, options = parse_url(address)
     db = options.setdefault('db', db)
     password = options.setdefault('password', password)
@@ -36,9 +39,8 @@ def widgets_create_pool(
 
     return WidgetsRedisConnectionsPool(
         address=address, db=db, password=password, encoding=encoding,
-        minsize=size, maxsize=size, ssl=ssl, parser=parser,
-        create_connection_timeout=create_connection_timeout,
-        connection_cls=RedisConnection)
+        minsize=size, maxsize=size, ssl=ssl,
+        create_connection_timeout=create_connection_timeout)
 
 
 def generate_redis_decorator(*, pool_mapping: Dict[str, ConnectionsPool]):
