@@ -1,10 +1,16 @@
 # -*- coding: UTF-8 -*-
 
 import functools
+import random
+import time
 from datetime import datetime
 from enum import Enum
 
 from dateutil.tz import tzlocal, tzutc
+
+
+def default_random_nonce_func():
+    return f'{random.randint(0, 0xFFFFF):05X}{int(time.time() * 1e3):011X}'
 
 
 class PrintMixin(object):

@@ -11,6 +11,7 @@ from tornado.log import access_log
 from tornado.options import options
 
 from tornado_widgets.error import BaseError, WidgetsParameterError
+from tornado_widgets.utils import default_random_nonce_func
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -20,6 +21,8 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.random_nonce = self.settings.get(
+            'random_nonce_func', default_random_nonce_func)()
         self.headers = dict()
         self.query_args = dict()
         self.form_data = dict()

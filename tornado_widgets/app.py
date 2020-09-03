@@ -12,6 +12,7 @@ from tornado_widgets.handler import WidgetsJSON404Handler
 from tornado_widgets.log import generate_widgets_default_log_request
 from tornado_widgets.router import Router
 from tornado_widgets.sentry import TornadoWidgetsIntegration
+from tornado_widgets.utils import default_random_nonce_func
 
 
 class App(object):
@@ -31,6 +32,7 @@ class App(object):
                 app_name=self.name),
             default_handler_class=WidgetsJSON404Handler,
             default_handler_args=dict(status_code=404),
+            random_nonce_func=default_random_nonce_func,
         )
         if settings:
             self.settings.update(**settings)
