@@ -107,8 +107,7 @@ class JSONHandler(BaseHandler):
             result, option=(orjson.OPT_SORT_KEYS | orjson.OPT_STRICT_INTEGER),
         ).replace(b'</', b'<\\/')
         self.set_header('Content-Type', 'application/json; charset=UTF-8')
-        self.write(result_bytes)
-        self.finish()
+        self.finish(chunk=result_bytes)
 
     def write_error(self, status_code: int, **kwargs) -> None:
         default = dict(

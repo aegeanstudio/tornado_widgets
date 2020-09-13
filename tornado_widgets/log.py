@@ -19,8 +19,9 @@ except ImportError:
 def _simple_stat_influxdb(app_name, handler):
     _influxdb = getattr(_simple_stat_influxdb, '_influxdb', None)
     if not _influxdb:
+        default_kwargs = dict(gzip=True, timeout=1)
         _influxdb = InfluxDBClient.from_dsn(
-            dsn=options.widgets_simple_stat_influxdb_dsn)
+            dsn=options.widgets_simple_stat_influxdb_dsn, **default_kwargs)
         try:
             _influxdb.create_database(
                 dbname=f'widgets_stat_{app_name}')
@@ -102,7 +103,6 @@ def generate_widgets_default_log_request(app_name: str):
         )
 
         if InfluxDBClient and options.widgets_simple_stat_influxdb_dsn:
-            _simple_stat_influxdb(
-                app_name=app_name, handler=handler)
+            _simple_stat_influxdb(app_name=app_name, handler=handler)
 
     return log_request
